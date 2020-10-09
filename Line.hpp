@@ -3,6 +3,7 @@
 #include "Point.hpp"
 
 #include <optional>
+#include <vector>
 
 namespace qslicer {
   
@@ -30,5 +31,11 @@ namespace qslicer {
   std::optional<Point> intersection(const Line &, const Line &, const float delta = 0.007);
 
   bool pointInLine(const Point &, const Line &);
+
+  // Given a vector of lines that make a manifold perimeter on a slice
+  // and a percentage of space that should be infill 
+  // Returns a vector of lines (grid pattern) for that slice
+  // Assumes print bed area is a square
+  std::vector<Line> infill (const std::vector<Line> &perimeter, const float percent, const float bedWidth = 150.00f, const float extrudeWidth = 0.007f);
 
 } // namespace qslicer

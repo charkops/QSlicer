@@ -73,7 +73,7 @@ namespace qslicer {
           points_.push_back(*point3);
 
         std::vector<Point> points;
-        for (std::vector<Point>::size_type i = 0; i < points.size(); i++) {
+        for (std::vector<Point>::size_type i = 0; i < points_.size(); i++) {
           auto j = i + 1;
           auto unique = true;
           while (j < points_.size()) {
@@ -177,6 +177,28 @@ namespace qslicer {
     }
 
     return newShape;
+  };
+
+  std::vector<std::vector<Slice>> generateSupports (const std::vector<Triangle> &triangles, const float layerThickness) {
+    auto bounds = findBoundaries(triangles);
+    auto trianglesDown = downwardTriangles(triangles);
+
+    std::vector<Triangle> trianglesForSupport;
+    for (const auto &tri : trianglesDown) {
+      if (supportNeeded(tri, triangles, std::get<0>(bounds)))
+        trianglesForSupport.insert(trianglesForSupport.begin(), tri);
+    }
+
+    std::vector<std::vector<Triangle>> supportShapes;
+    for (const auto &triangle : trianglesForSupport)
+      supportShapes.insert(supportShapes.begin(), generateSupportShape(triangle, std::get<0>(bounds)));
+    
+
+    std::vector<std::vector<Slice>> supportSlices;
+    for (const auto &shape : supportShapes)
+      supportSlices.insert(supportSlices.begin(), separateSlices(shape, layerThickness));
+
+    return supportSlices;
   };
 
 } // namespace qslicer

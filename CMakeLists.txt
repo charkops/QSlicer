@@ -11,6 +11,7 @@ set (lib_source_files
         Triangle.cpp
         io.cpp
         Slice.cpp
+        Writer.cpp
 )
 
 add_library(qslicer ${lib_source_files})

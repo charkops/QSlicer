@@ -44,6 +44,8 @@ namespace qslicer {
   // returns the list of triangles required to form the support shape under that triangle
   std::vector<Triangle> generateSupportShape(const Triangle &, const float);
 
-  // TODO (@charkops): Implement generate support
+  // Given a vector of triangles
+  // Returns a vector of vector of slices to draw supports for any downward-facing triangles
+  std::vector<std::vector<Slice>> generateSupports (const std::vector<Triangle> &, const float);
 
 } // namespace qslicer

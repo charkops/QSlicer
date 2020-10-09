@@ -1,6 +1,9 @@
 #include "Line.hpp"
 #include "common.hpp"
 
+#include <stdexcept>
+#include <cmath>
+
 namespace qslicer {
   void Line::reverse() {
     swap(p0, p1);
@@ -88,6 +91,64 @@ namespace qslicer {
       return true;
     else
       return false;
+  };
+
+  std::vector<Line> infill (const std::vector<Line> &perimeter, const float percent, const float bedWidth, const float extrudeWidth) {
+    if (percent < 0 || percent > 1)
+      throw std::out_of_range("Percent out of range");
+
+    if (perimeter.empty())
+      return {};
+    
+    // Z should be the same across all lines
+    auto Z = perimeter[0].p0.z;
+    unsigned int numLines = static_cast<unsigned int>(std::round((bedWidth*percent) / extrudeWidth));
+    auto gap = bedWidth / numLines;
+
+    std::vector<Line> infill;
+    for (unsigned int x = 0; x < numLines; ++x) {
+      auto fullLine = Line(Point((bedWidth / (-2)) + (x*gap), bedWidth / (-2), Z), Point((bedWidth / (-2)) + (x*gap), bedWidth / 2, Z));
+
+      std::vector<Point> inters;
+
+      // Find intersections without repeats
+      for (const auto &line : perimeter) {
+        auto sect = intersection(line, fullLine);
+        if (sect) {
+          auto newVal = true;
+          for (const auto &i : inters) {
+            if (close(i.y, (*sect).y))
+              newVal = false;
+          }
+          if (newVal)
+            inters.push_back(*sect);
+        }
+      }
+
+      // Sort by y to get matching pairs
+      std::sort(inters.begin(), inters.end(), [](const Point &p1, const Point &p2) {
+        return p1.y < p2.y;
+      });
+
+      // If not even, something went wrong and its safer not to print
+      if (inters.size() % 2 == 0) {
+        for (std::vector<Point>::size_type i = 0; i < inters.size(); ++i) {
+          if (i % 2 != 0) {
+            auto overlap = false;
+            auto newLine = Line(inters[i - 1], inters[i]);
+            for (const auto &l : perimeter) {
+              if (lineEqual(l, newLine))
+                overlap = true;
+            }
+            if (!overlap) {
+              infill.push_back(newLine);
+            }
+          }
+        }
+      }
+    }
+
+    return infill;
   };
 
 } // namespace qslicer

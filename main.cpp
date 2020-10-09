@@ -5,6 +5,7 @@
 #include "Line.hpp"
 #include "Triangle.hpp"
 #include "io.hpp"
+#include "Writer.hpp"
 
 using std::cout;
 using std::endl;
@@ -31,9 +32,31 @@ int main(int argc, char **argv) {
   }
 
   const std::string fileName (argv[1]);
+  const float layerThickness = 0.1f;
+  const float infillPercent = 0.2f;
+  const float supportInfill = 0.5f;
 
   auto triangles = fileToTriangles(fileName);
   cout << "Found " << triangles.size() << " triangles\n";
+  auto slices = separateSlices(triangles, layerThickness);
+  for (auto &s : slices) {
+    s = cleanPerimeter(s);
+    if (s.isSurface)
+      s.infill = infill(s.perimeter, 1);
+    else
+      s.infill = infill(s.perimeter, infillPercent);
+  }
+    
+  auto supportSlices = generateSupports(triangles, layerThickness);
+  for (const auto &shape : supportSlices) {
+    for (std::vector<Slice>::size_type s = 0; s < shape.size(); s++) {
+      slices[s].support.push_back(infill(shape[s].perimeter, supportInfill));
+    }
+  }
+
+  writeGcode(slices, fileName);
+
+
 
 
   return EXIT_SUCCESS;
