@@ -4,6 +4,8 @@
 #include <stdexcept>
 #include <cmath>
 
+// #include "timer.hpp"
+
 namespace qslicer {
   void Line::reverse() {
     swap(p0, p1);
@@ -69,7 +71,10 @@ namespace qslicer {
     auto ynum = (x1*y2-y1*x2)*(y3-y4) - (y1-y2)*(x3*y4-y3*x4);
     auto yden = (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4);
 
-    try {
+    // try {
+      if (xden == 0 || yden == 0)
+        return std::nullopt;
+
       auto intersect = Point(xnum / xden, ynum / yden, l1.p0.z);
       if ((intersect.x >= std::min(x1,x2)-delta) && (intersect.x <= std::max(x1,x2)+delta) &&
             (intersect.y >= std::min(y1,y2)-delta) && (intersect.y <= std::max(y1,y2)+delta) &&
@@ -78,9 +83,9 @@ namespace qslicer {
         return intersect;
       else
         return std::nullopt;
-    } catch (const std::exception &e) {
-      return std::nullopt;
-    }
+    // } catch (const std::exception &e) {
+      // return std::nullopt;
+    // }
 
   };
 
@@ -106,11 +111,10 @@ namespace qslicer {
     auto gap = bedWidth / numLines;
 
     std::vector<Line> infill;
-    std::vector<Point> inters;
     for (unsigned int x = 0; x < numLines; ++x) {
       auto fullLine = Line(Point((bedWidth / (-2)) + (x*gap), bedWidth / (-2), Z), Point((bedWidth / (-2)) + (x*gap), bedWidth / 2, Z));
-
-      inters.clear();
+      
+      std::vector<Point> inters;
 
       // Find intersections without repeats
       for (const auto &line : perimeter) {
