@@ -106,10 +106,11 @@ namespace qslicer {
     auto gap = bedWidth / numLines;
 
     std::vector<Line> infill;
+    std::vector<Point> inters;
     for (unsigned int x = 0; x < numLines; ++x) {
       auto fullLine = Line(Point((bedWidth / (-2)) + (x*gap), bedWidth / (-2), Z), Point((bedWidth / (-2)) + (x*gap), bedWidth / 2, Z));
 
-      std::vector<Point> inters;
+      inters.clear();
 
       // Find intersections without repeats
       for (const auto &line : perimeter) {
