@@ -7,8 +7,6 @@
 #include "io.hpp"
 #include "Writer.hpp"
 
-#include "timer.hpp"
-
 using std::cout;
 using std::endl;
 
