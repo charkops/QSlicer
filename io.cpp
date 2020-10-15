@@ -75,6 +75,7 @@ namespace qslicer {
     std::vector<Triangle> triangles;
     std::string line;
     while(std::getline(file, line)) {
+      line.erase(std::remove(line.begin(), line.end(), '\t'), line.end());
       std::vector<std::string> members;
       boost::split(members, line, [](char c){
         return c == ' ';
