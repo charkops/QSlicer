@@ -11,6 +11,10 @@ namespace qslicer {
     return x * p.x + y * p.y + z * p.z;
   };
 
+  double Point::cross(const Point &p) const {
+    return Point(y*p.z - z*p.y, x*p.z - z*p.x, x*p.y - y*p.x).normalize();
+  };
+
   double Point::normalize() const {
     return std::sqrt(x*x + y*y + z*z);
   };

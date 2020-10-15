@@ -18,6 +18,7 @@ namespace qslicer {
     bool equals(const Point &p) const;
 
     double dot(const Point &p) const;
+    double cross(const Point &p) const;
     double normalize() const;
   };
 
