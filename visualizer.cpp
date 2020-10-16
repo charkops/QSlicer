@@ -102,6 +102,7 @@ void keyboardEventOccured(const pcl::visualization::KeyboardEvent &event, void *
         idx--;
     }
     cout << "[idx]: " << idx << endl;
+    cout << "[perimeter.size()]: " << viewerSlices.slices[idx].perimeter.size() << endl;
 
     auto viewer = viewerSlices.viewer;
     viewer->removeAllShapes();

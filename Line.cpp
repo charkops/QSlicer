@@ -45,6 +45,19 @@ namespace qslicer {
     return p.parallel(other);
   };
 
+  std::optional<Line> concat(const Line &line_1, const Line &line_2) {
+    if (!line_1.parallel(line_2))
+      return std::nullopt;
+
+    if (line_1.p0 == line_2.p1)
+      return Line(line_2.p0, line_1.p1);
+
+    if (line_1.p1 == line_2.p0)
+      return Line(line_1.p0, line_2.p1);
+
+    return std::nullopt;
+  };
+
   bool Line::operator==(const Line &line) const {
     return (p0 == line.p0) && (p1 == line.p1);
   };

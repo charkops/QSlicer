@@ -32,6 +32,9 @@ namespace qslicer {
   // "Simply" determines if 2 lines are "close" to each other
   bool lineCloseSimple(const Line&, const Line&, const double epsilon = 0.001);
 
+  // Checks to see if 2 lines can be concatenated, if they can, returns the new line segment
+  std::optional<Line> concat (const Line &, const Line &);
+
   // given two lines on the same z plane, 
   // returns the point at which they intersect,
   // or None if there is no intersection
