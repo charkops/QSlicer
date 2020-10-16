@@ -27,7 +27,7 @@ namespace qslicer {
     std::optional<Point> intersectSlice(const float);
   };
 
-  bool lineEqual(const Line &, const Line &, const double delta = 0.007);
+  bool lineEqual(const Line &, const Line &, const double delta = 0.004);
 
   // "Simply" determines if 2 lines are "close" to each other
   bool lineCloseSimple(const Line&, const Line&, const double epsilon = 0.001);
@@ -38,7 +38,7 @@ namespace qslicer {
   // given two lines on the same z plane, 
   // returns the point at which they intersect,
   // or None if there is no intersection
-  std::optional<Point> intersection(const Line &, const Line &, const float delta = 0.007);
+  std::optional<Point> intersection(const Line &, const Line &, const float delta = 0.004);
 
   bool pointInLine(const Point &, const Line &);
 
@@ -46,6 +46,6 @@ namespace qslicer {
   // and a percentage of space that should be infill 
   // Returns a vector of lines (grid pattern) for that slice
   // Assumes print bed area is a square
-  std::vector<Line> infill (const std::vector<Line> &perimeter, const float percent, const float bedWidth = 150.00f, const float extrudeWidth = 0.007f);
+  std::vector<Line> infill (const std::vector<Line> &perimeter, const float percent, const float bedWidth = 150.00f, const float extrudeWidth = 0.4f);
 
 } // namespace qslicer

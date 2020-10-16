@@ -10,6 +10,8 @@ namespace qslicer {
       while (j < setPerimeter.size()) {
         if (lineEqual(setPerimeter[i], setPerimeter[j])) {
           // TODO (@charkops): Does this really do what i think it does ?
+          // TODO (@charkops): No it surely does not work as intended, but we are lucky
+          // cause this rarely needs to happen (actually may never happen)!
           setPerimeter.erase(setPerimeter.begin() + j);
         } else {
           j++;

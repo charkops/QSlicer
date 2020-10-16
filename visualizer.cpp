@@ -119,8 +119,8 @@ int main(int argc, char **argv) {
 
   const std::string fileName (argv[1]);
   const float layerThickness = 0.4f;
-  const float infillPercent = 0.02f;
-  const float supportInfillPercentage = 0.02f;
+  const float infillPercent = 0.25f;
+  const float supportInfillPercentage = 0.5f;
 
   
   auto triangles = fileToTriangles(fileName);
@@ -132,7 +132,7 @@ int main(int argc, char **argv) {
   for (auto &s : slices) {
     s = cleanPerimeter(s);
     if (s.isSurface)
-      s.infill = infill(s.perimeter, 0.05);
+      s.infill = infill(s.perimeter, 1);
     else
       s.infill = infill(s.perimeter, infillPercent);
   }
@@ -151,12 +151,12 @@ int main(int argc, char **argv) {
   ViewerSlices viewerSlices;
   viewerSlices.viewer = viewer;
   viewerSlices.slices = slices;
-  viewerSlices.options = {false, true};
+  viewerSlices.options = {true, true};
   viewer->registerKeyboardCallback(keyboardEventOccured, (void *) &viewerSlices);
   
   addSliceToViewer(slices[slices.size() / 2], viewer, viewerSlices.options);
 
-  cout <<slices[slices.size() / 2].perimeter.size() << '\n';
+  cout << slices[slices.size() / 2].perimeter.size() << '\n';
 
   viewer->resetCamera();
   while(!viewer->wasStopped())
