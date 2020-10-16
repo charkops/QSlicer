@@ -72,6 +72,7 @@ namespace qslicer {
         if (point3)
           points_.push_back(*point3);
 
+        // NOTE (@charkops): Insert unique points to vec ? Why not use std::set ?
         std::vector<Point> points;
         for (std::vector<Point>::size_type i = 0; i < points_.size(); i++) {
           auto j = i + 1;

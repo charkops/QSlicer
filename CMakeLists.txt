@@ -32,4 +32,8 @@ if (PCL_FOUND)
   add_executable(visualizer_support visualizer_support.cpp)  
   target_include_directories(visualizer_support PRIVATE ${PCL_INCLUDE_DIRS})
   target_link_libraries(visualizer_support qslicer ${PCL_LIBRARIES})
+
+  add_executable(visualize_perimeter visualize_perimeter.cpp)  
+  target_include_directories(visualize_perimeter PRIVATE ${PCL_INCLUDE_DIRS})
+  target_link_libraries(visualize_perimeter qslicer ${PCL_LIBRARIES})
 endif (PCL_FOUND)

@@ -33,6 +33,10 @@ namespace qslicer {
     return false;
   };
 
+  bool close_simple(const Point &p1, const Point &p2, const double epsilon) {
+    return close_simple(p1.x, p2.x, epsilon) && close_simple(p1.y, p2.y, epsilon) && close_simple(p1.z, p2.z, epsilon);
+  };
+
   void swap(Point &p1, Point &p2) {
     using std::swap;
     swap(p1.x, p2.x);

@@ -28,18 +28,18 @@ std::ostream & operator<<(std::ostream &os, const Triangle &t) {
   return os << t.p0 << " - " << t.p1 << " - " << t.p2;
 };
 
-void addLineToViewer(const pcl::PointXYZ &p0, const pcl::PointXYZ &p1, pcl::visualization::PCLVisualizer::Ptr viewer) {
+void addLineToViewer(const pcl::PointXYZ &p0, const pcl::PointXYZ &p1, pcl::visualization::PCLVisualizer::Ptr viewer, int viewport = 0) {
   static long int counter = 1;
   std::stringstream ss;
   ss << "line_" << counter++;
-  viewer->addLine(p0, p1, ss.str());
+  viewer->addLine(p0, p1, ss.str(), viewport);
 };
 
-void addLineToViewer(const Line &line, pcl::visualization::PCLVisualizer::Ptr viewer) {
+void addLineToViewer(const Line &line, pcl::visualization::PCLVisualizer::Ptr viewer, int viewport = 0) {
   pcl::PointXYZ p0 (line.p0.x, line.p0.y, line.p0.z);
   pcl::PointXYZ p1 (line.p1.x, line.p1.y, line.p1.z);
     
-  addLineToViewer(p0, p1, viewer);
+  addLineToViewer(p0, p1, viewer, viewport);
 };
 
 void addTriangleToViewer(const Triangle &tri, pcl::visualization::PCLVisualizer::Ptr viewer) {
@@ -126,6 +126,16 @@ void keyboardEventOccured(const pcl::visualization::KeyboardEvent &event, void *
   }
 };
 
+// template <typename T>
+auto existsInIdx = [](const auto &idx, const auto &idx_list){
+  for (const auto &i : idx_list)
+  {
+    if (i == idx)
+      return true;
+  }
+  return false;
+};
+
 int main(int argc, char **argv) {
   if (argc != 2) {
     cout << "Provide an .stl file\n";
@@ -184,56 +194,99 @@ int main(int argc, char **argv) {
     if (!line_1.parallel(line_2))
       return std::nullopt;
 
+    // If lines are parallel &&
     if (line_1.p0 == line_2.p1) {
       return Line(line_2.p0, line_1.p1);
     }
-
-    if (line_1.p1 == line_2.p0) {
+    else if (line_1.p1 == line_2.p0) {
       return Line(line_1.p0, line_2.p1);
+    } else {
+      return std::nullopt;
     }
   };
 
   // New Block
   {
+    using lines_size = std::vector<Line>::size_type;
     unsigned int counter = 0;
     std::vector<Line> lines;
-    for (std::vector<Line>::size_type i = 0; i < serializedLines.size(); ++i) {
-      auto line = serializedLines[i];
+    std::vector<lines_size> idxs;
+    for (lines_size i = 0; i < serializedLines.size(); ++i) {
+      auto line_1 = serializedLines[i];
+      if (existsInIdx(i, idxs))
+        continue;
 
-      // Search for each line if can be concatenated
-      // If it can be concatenated, don't push it back
-      auto canConcat = false;
-      for (std::vector<Line>::size_type j = 0; j < serializedLines.size(); ++j) {
+      auto concated = false;
+      for (lines_size j = 0; j < serializedLines.size(); ++j) {
         if (i == j) continue;
+        if (existsInIdx(j, idxs))
+          continue;
+        
+
         auto line_2 = serializedLines[j];
-
-
-        auto res = shouldConcatLines(line, line_2);
+        auto res = shouldConcatLines(line_1, line_2);
         if (res) {
-          canConcat = true;
+          lines.push_back(*res);
           counter++;
-          if (!existsInVec(*res, lines))
-            lines.push_back(*res);
+          idxs.push_back(i);
+          idxs.push_back(j);
+          concated = true;
           break;
         }
       }
-
-      // Don't concat
-      if (canConcat) {
-
-      } else {
-        // Push back 
-        if (!existsInVec(line, lines))
-          lines.push_back(line);
+      if (!concated) {
+        lines.push_back(line_1);
       }
     }
 
-    cout << "After 1 pass lines: " << lines.size() << '\n';
-    cout << "Concated: " << counter << " lines\n";
-
-
     serializedLines = lines;
+
+    cout << "Can concat " << counter << " times\n";
+    cout << "lines.size() == " << lines.size() << '\n';
   }
+
+  // New Block
+  // {
+  //   using lines_size = std::vector<Line>::size_type;
+  //   unsigned int counter = 0;
+  //   std::vector<Line> lines;
+  //   for (lines_size i = 0; i < serializedLines.size(); ++i) {
+  //     auto line = serializedLines[i];
+
+  //     // Search for each line if can be concatenated
+  //     // If it can be concatenated, don't push it back
+  //     auto canConcat = false;
+  //     for (lines_size j = 0; j < serializedLines.size(); ++j) {
+  //       if (i == j) continue;
+  //       auto line_2 = serializedLines[j];
+
+
+  //       auto res = shouldConcatLines(line, line_2);
+  //       if (res) {
+  //         canConcat = true;
+  //         counter++;
+  //         if (!existsInVec(*res, lines))
+  //           lines.push_back(*res);
+  //         break;
+  //       }
+  //     }
+
+  //     // Don't concat
+  //     if (canConcat) {
+
+  //     } else {
+  //       // Push back 
+  //       if (!existsInVec(line, lines))
+  //         lines.push_back(line);
+  //     }
+  //   }
+
+  //   cout << "After 1 pass lines: " << lines.size() << '\n';
+  //   cout << "Concated: " << counter << " lines\n";
+
+
+  //   serializedLines = lines;
+  // }
 
   pcl::visualization::PCLVisualizer::Ptr viewer (new pcl::visualization::PCLVisualizer ("3D Viewer"));
   ViewerSlices viewerSlices;

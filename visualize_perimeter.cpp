@@ -28,11 +28,18 @@ std::ostream & operator<<(std::ostream &os, const Triangle &t) {
   return os << t.p0 << " - " << t.p1 << " - " << t.p2;
 };
 
-void addLineToViewer(const pcl::PointXYZ &p0, const pcl::PointXYZ &p1, pcl::visualization::PCLVisualizer::Ptr viewer) {
+void addLineToViewer(const pcl::PointXYZ &p0, const pcl::PointXYZ &p1, pcl::visualization::PCLVisualizer::Ptr viewer, int viewport = 0) {
   static long int counter = 1;
   std::stringstream ss;
   ss << "line_" << counter++;
-  viewer->addLine(p0, p1, ss.str());
+  viewer->addLine(p0, p1, ss.str(), viewport);
+};
+
+void addLineToViewer(const Line &line, pcl::visualization::PCLVisualizer::Ptr viewer, int viewport = 0) {
+  pcl::PointXYZ p0 (line.p0.x, line.p0.y, line.p0.z);
+  pcl::PointXYZ p1 (line.p1.x, line.p1.y, line.p1.z);
+    
+  addLineToViewer(p0, p1, viewer, viewport);
 };
 
 void addTriangleToViewer(const Triangle &tri, pcl::visualization::PCLVisualizer::Ptr viewer) {
@@ -150,12 +157,34 @@ int main(int argc, char **argv) {
   ViewerSlices viewerSlices;
   viewerSlices.viewer = viewer;
   viewerSlices.slices = slices;
-  viewerSlices.options = {false, true};
+  viewerSlices.options = {false, false};
   viewer->registerKeyboardCallback(keyboardEventOccured, (void *) &viewerSlices);
   
+  auto slice = slices[slices.size() / 2];
+
   addSliceToViewer(slices[slices.size() / 2], viewer, viewerSlices.options);
 
-  cout <<slices[slices.size() / 2].perimeter.size() << '\n';
+  cout << "Perimeter: " << slice.perimeter.size() << '\n';
+
+  // auto slice = slices[slices.size() / 2];
+  // using lines_size = std::vector<Line>::size_type;
+  // lines_size counter = 0;
+  // while(counter != slice.perimeter.size()) {
+
+  //   pcl::visualization::PCLVisualizer::Ptr vi (new pcl::visualization::PCLVisualizer);
+  //   addLineToViewer(slice.perimeter[counter], vi);
+  //   cout << counter << ": " << slice.perimeter[counter] << '\n';
+    
+  //   vi->resetCamera();
+  //   while(!vi->wasStopped())
+  //     vi->spinOnce(10);
+
+  //   counter++;
+  // }
+
+  
+
+  
 
   viewer->resetCamera();
   while(!viewer->wasStopped())

@@ -15,17 +15,27 @@ namespace qslicer {
   //   return 
   // };
 
-  // Wtf does this even do ?
-  bool lineEqual(const Line &l1, const Line &l2) {
-    if ((close(l1.p0.x, l2.p0.x) && close(l1.p0.y, l2.p0.y) 
-      && close(l1.p1.x, l2.p1.x) && close(l1.p1.y, l2.p1.y))
-      || (close(l1.p0.x, l2.p1.x) && close(l1.p0.y, l2.p1.y)
-      && close(l1.p1.x, l2.p0.x) && close(l1.p1.y, l2.p0.y)))
+  // For "pretty close lines". Could be refactored to use Point::equals, which does the exact same thing
+  bool lineEqual(const Line &l1, const Line &l2, const double delta) {
+    if ((close(l1.p0.x, l2.p0.x, delta) && close(l1.p0.y, l2.p0.y, delta) 
+      && close(l1.p1.x, l2.p1.x, delta) && close(l1.p1.y, l2.p1.y, delta))
+      || (close(l1.p0.x, l2.p1.x, delta) && close(l1.p0.y, l2.p1.y, delta)
+      && close(l1.p1.x, l2.p0.x, delta) && close(l1.p1.y, l2.p0.y, delta)))
     {
-        return true;
+      return true;
     } else {
       return false;
     }
+  };
+
+  bool lineCloseSimple(const Line &l1, const Line &l2, const double epsilon) {
+    if (close_simple(l1.p0, l2.p0, epsilon) && close_simple(l1.p1, l2.p1, epsilon))
+      return true;
+
+    if (close_simple(l1.p0, l2.p1, epsilon) && close_simple(l1.p1, l2.p0, epsilon))
+      return true;
+
+    return false;
   };
 
   bool Line::parallel(const Line &line) const {

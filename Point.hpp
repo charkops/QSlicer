@@ -24,6 +24,7 @@ namespace qslicer {
   };
 
   void swap(Point &, Point &);
+  bool close_simple(const Point &p1, const Point &p2, const double epsilon = 0.001);
 
   Point operator-(const Point &p1, const Point &p2);
   

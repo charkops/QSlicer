@@ -27,7 +27,10 @@ namespace qslicer {
     std::optional<Point> intersectSlice(const float);
   };
 
-  bool lineEqual(const Line &, const Line &);
+  bool lineEqual(const Line &, const Line &, const double delta = 0.007);
+
+  // "Simply" determines if 2 lines are "close" to each other
+  bool lineCloseSimple(const Line&, const Line&, const double epsilon = 0.001);
 
   // given two lines on the same z plane, 
   // returns the point at which they intersect,
