@@ -20,6 +20,10 @@ namespace qslicer {
     // Swaps p0 and p1
     void reverse();
 
+    bool parallel(const Line &line) const;
+
+    bool operator==(const Line &line) const;
+
     std::optional<Point> intersectSlice(const float);
   };
 

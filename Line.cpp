@@ -28,6 +28,17 @@ namespace qslicer {
     }
   };
 
+  bool Line::parallel(const Line &line) const {
+    auto p = p1 - p0;
+    auto other = line.p1 - line.p0;
+
+    return p.parallel(other);
+  };
+
+  bool Line::operator==(const Line &line) const {
+    return (p0 == line.p0) && (p1 == line.p1);
+  };
+
   // given a line segment and a plane,
   // returns the point at which those two
   // planes intersect. Will return the first point

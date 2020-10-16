@@ -19,10 +19,13 @@ namespace qslicer {
 
     double dot(const Point &p) const;
     double cross(const Point &p) const;
+    bool parallel(const Point &p) const;
     double normalize() const;
   };
 
   void swap(Point &, Point &);
+
+  Point operator-(const Point &p1, const Point &p2);
   
   // Helper function for aboveTriangle
   float sign(const Point &, const Point &, const Point &);

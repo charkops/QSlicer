@@ -15,6 +15,10 @@ namespace qslicer {
     return Point(y*p.z - z*p.y, x*p.z - z*p.x, x*p.y - y*p.x).normalize();
   };
 
+  bool Point::parallel(const Point &p) const {
+    return this->cross(p) == 0;
+  };
+
   double Point::normalize() const {
     return std::sqrt(x*x + y*y + z*z);
   };
@@ -34,6 +38,10 @@ namespace qslicer {
     swap(p1.x, p2.x);
     swap(p1.y, p2.y);
     swap(p1.z, p2.z);
+  };
+
+  Point operator-(const Point &p1, const Point &p2) {
+    return Point(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z);
   };
 
   float sign(const Point &p1, const Point &p2, const Point &p3) {
