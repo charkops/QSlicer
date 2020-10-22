@@ -2,95 +2,27 @@
 
 #include "Point.hpp"
 
-// For split
-#include <boost/algorithm/string/split.hpp>
+#include "stl_reader/stl_reader.h"
 
 namespace qslicer {
 
-  // NOTE (@charkops): This whole function needs fixing
-  Triangle readFacet(std::ifstream &file, const std::string &line) {
-    // Split line into members
-    std::vector<std::string> members;
-    boost::split(members, line, [](char c) {
-      return c == ' ';
-    });
-    members.erase(std::remove_if(
-        members.begin(),
-        members.end(),
-        [](const std::string &s){
-          return s.empty();
-        }
-      ), members.end());
-    if (members[0] == "facet") {
-      Point normal (std::stof(members[2]), std::stof(members[3]), std::stof(members[4]));
-      std::string l;
-      std::getline(file, l);
-      std::getline(file, l);
-      boost::split(members, l, [](char c) {
-        return c == ' ';
-      });
-      members.erase(std::remove_if(
-        members.begin(),
-        members.end(),
-        [](const std::string &s){
-          return s.empty();
-        }
-      ), members.end());
-      Point p0 (std::stof(members[1]), std::stof(members[2]), std::stof(members[3]));
-      std::getline(file, l);
-      boost::split(members, l, [](char c) {
-        return c == ' ';
-      });
-      members.erase(std::remove_if(
-        members.begin(),
-        members.end(),
-        [](const std::string &s){
-          return s.empty();
-        }
-      ), members.end());
-      Point p1 (std::stof(members[1]), std::stof(members[2]), std::stof(members[3]));
-      std::getline(file, l);
-      boost::split(members, l, [](char c) {
-        return c == ' ';
-      });
-      members.erase(std::remove_if(
-        members.begin(),
-        members.end(),
-        [](const std::string &s){
-          return s.empty();
-        }
-      ), members.end());
-      Point p2 (std::stof(members[1]), std::stof(members[2]), std::stof(members[3]));
-
-      return Triangle (p0, p1, p2, normal);
-    }
-  };
-
   std::vector<Triangle> fileToTriangles(const std::string &fileName) {
-    // Open file as read
-    std::ifstream file (fileName, std::ios::in);
-    if (!file.good())
-      throw std::runtime_error("Could not open/read file: " + fileName);
-
+    stl_reader::StlMesh <float, unsigned int> mesh (fileName);
     std::vector<Triangle> triangles;
-    std::string line;
-    while(std::getline(file, line)) {
-      line.erase(std::remove(line.begin(), line.end(), '\t'), line.end());
-      std::vector<std::string> members;
-      boost::split(members, line, [](char c){
-        return c == ' ';
-      });
-      members.erase(std::remove_if(
-        members.begin(),
-        members.end(),
-        [](const std::string &s){
-          return s.empty();
-        }
-      ), members.end());
-      if (members[0] == "facet")
-        triangles.push_back(readFacet(file, line));
+    for (std::size_t i = 0; i < mesh.num_tris(); ++i) {
+      const float *n = mesh.tri_normal(i);
+      Point normal (n[0], n[1], n[2]);
+
+      const float *p0_ = mesh.vrt_coords(mesh.tri_corner_ind(i, 0));
+      Point p0 (p0_[0], p0_[1], p0_[2]);
+      const float *p1_ = mesh.vrt_coords(mesh.tri_corner_ind(i, 1));
+      Point p1 (p1_[0], p1_[1], p1_[2]);
+      const float *p2_ = mesh.vrt_coords(mesh.tri_corner_ind(i, 2));
+      Point p2 (p2_[0], p2_[1], p2_[2]);
+
+      triangles.push_back(Triangle(p0, p1, p2, normal));
     }
 
     return triangles;
-  };
+  }
 } // namespace qslicer
